@@ -1,0 +1,194 @@
+---------------------------------------------------
+-- AADL2.2
+-- TASTE type interfaceview
+-- 
+-- generated code: do not edit
+---------------------------------------------------
+
+PACKAGE interfaceview::IV::sim_rover
+PUBLIC
+
+WITH interfaceview::IV::testConsumer;
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+SUBPROGRAM PI_motion_cmd
+FEATURES
+  cmd : IN PARAMETER DataView::Base_commands_Motion2D {
+    Taste::encoding => NATIVE;
+  };
+END PI_motion_cmd;
+
+SUBPROGRAM IMPLEMENTATION PI_motion_cmd.others
+PROPERTIES
+  Compute_Execution_Time => 0 ms .. 0 ms;
+END PI_motion_cmd.others;
+
+SUBPROGRAM RI_update_bodystate
+FEATURES
+  bs_update : IN PARAMETER DataView::Base_samples_RigidBodyState {
+    Taste::encoding => NATIVE;
+  };
+END RI_update_bodystate;
+
+SUBPROGRAM IMPLEMENTATION RI_update_bodystate.others
+END RI_update_bodystate.others;
+
+SYSTEM sim_rover
+FEATURES
+  PI_motion_cmd : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::sim_rover::PI_motion_cmd.others {
+    Taste::coordinates => "98680 91387";
+    Taste::RCMoperationKind => sporadic;
+    Taste::Deadline => 0 ms;
+    Taste::InterfaceName => "motion_cmd";
+  };
+  RI_update_bodystate : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::testConsumer::PI_update_bs.others {
+    Taste::coordinates => "203375 91180";
+    Taste::RCMoperationKind => any;
+    Taste::InterfaceName => "update_bodystate";
+    Taste::labelInheritance => "false";
+  };
+PROPERTIES
+  Source_Language => (CPP);
+  Taste::Active_Interfaces => any;
+  Source_Text => ("sim_rover.zip");
+END sim_rover;
+
+SYSTEM IMPLEMENTATION sim_rover.others
+END sim_rover.others;
+
+END interfaceview::IV::sim_rover;
+
+PACKAGE interfaceview::IV::testConsumer
+PUBLIC
+
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+SUBPROGRAM PI_update_bs
+FEATURES
+  bs_update : IN PARAMETER DataView::Base_samples_RigidBodyState {
+    Taste::encoding => NATIVE;
+  };
+PROPERTIES
+  Taste::Associated_Queue_Size => 1;
+END PI_update_bs;
+
+SUBPROGRAM IMPLEMENTATION PI_update_bs.others
+PROPERTIES
+  Compute_Execution_Time => 0 ms .. 0 ms;
+END PI_update_bs.others;
+
+SYSTEM testConsumer
+FEATURES
+  PI_update_bs : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::testConsumer::PI_update_bs.others {
+    Taste::coordinates => "242430 93629";
+    Taste::RCMoperationKind => unprotected;
+    Taste::RCMperiod => 0 ms;
+    Taste::Deadline => 0 ms;
+    Taste::InterfaceName => "update_bs";
+  };
+PROPERTIES
+  Source_Language => (CPP);
+  Taste::Active_Interfaces => any;
+END testConsumer;
+
+SYSTEM IMPLEMENTATION testConsumer.others
+END testConsumer.others;
+
+END interfaceview::IV::testConsumer;
+
+PACKAGE interfaceview::IV::testProducer
+PUBLIC
+
+WITH interfaceview::IV::sim_rover;
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+SUBPROGRAM PI_clock
+PROPERTIES
+  Taste::Associated_Queue_Size => 1;
+END PI_clock;
+
+SUBPROGRAM IMPLEMENTATION PI_clock.others
+PROPERTIES
+  Compute_Execution_Time => 0 ms .. 100 ms;
+END PI_clock.others;
+
+SUBPROGRAM RI_motion_cmd
+FEATURES
+  cmd : IN PARAMETER DataView::Base_commands_Motion2D {
+    Taste::encoding => NATIVE;
+  };
+END RI_motion_cmd;
+
+SUBPROGRAM IMPLEMENTATION RI_motion_cmd.others
+END RI_motion_cmd.others;
+
+SYSTEM testProducer
+FEATURES
+  PI_clock : PROVIDES SUBPROGRAM ACCESS interfaceview::IV::testProducer::PI_clock.others {
+    Taste::coordinates => "27563 74986";
+    Taste::RCMoperationKind => cyclic;
+    Taste::RCMperiod => 100 ms;
+    Taste::Deadline => 100 ms;
+    Taste::InterfaceName => "clock";
+  };
+  RI_motion_cmd : REQUIRES SUBPROGRAM ACCESS interfaceview::IV::sim_rover::PI_motion_cmd.others {
+    Taste::coordinates => "62320 84466";
+    Taste::RCMoperationKind => any;
+    Taste::InterfaceName => "motion_cmd";
+    Taste::labelInheritance => "true";
+  };
+PROPERTIES
+  Source_Language => (CPP);
+  Taste::Active_Interfaces => any;
+END testProducer;
+
+SYSTEM IMPLEMENTATION testProducer.others
+END testProducer.others;
+
+END interfaceview::IV::testProducer;
+
+PACKAGE interfaceview::IV
+PUBLIC
+
+WITH interfaceview::IV::sim_rover;
+WITH interfaceview::IV::testConsumer;
+WITH interfaceview::IV::testProducer;
+WITH Taste;
+WITH DataView;
+WITH TASTE_IV_Properties;
+SYSTEM interfaceview
+PROPERTIES
+  Taste::dataView => ("DataView");
+  Taste::dataViewPath => ("astra-sim_rover_dv.aadl");
+END interfaceview;
+
+SYSTEM IMPLEMENTATION interfaceview.others
+SUBCOMPONENTS
+  sim_rover : SYSTEM interfaceview::IV::sim_rover::sim_rover.others {
+    Taste::coordinates => "98680 73560 203375 138242";
+  };
+  testConsumer : SYSTEM interfaceview::IV::testConsumer::testConsumer.others {
+    Taste::coordinates => "242430 84149 285087 120487";
+  };
+  testProducer : SYSTEM interfaceview::IV::testProducer::testProducer.others {
+    Taste::coordinates => "5443 74986 62320 134390";
+  };
+CONNECTIONS
+  sim_rover_PI_motion_cmd_testProducer_RI_motion_cmd : SUBPROGRAM ACCESS sim_rover.PI_motion_cmd -> testProducer.RI_motion_cmd {
+    Taste::coordinates => "62320 84466 80500 84466 80500 91387 98680 91387";
+  };
+  testConsumer_PI_update_bs_sim_rover_RI_update_bodystate : SUBPROGRAM ACCESS testConsumer.PI_update_bs -> sim_rover.RI_update_bodystate {
+    Taste::coordinates => "203375 91180 222586 91180 222586 93629 242430 93629";
+  };
+END interfaceview.others;
+
+PROPERTIES
+  Taste::dataView => ("DataView");
+  Taste::dataViewPath => ("astra-sim_rover_dv.aadl");
+  Taste::coordinates => "0 0 297000 210000";
+  Taste::version => "2.2";
+END interfaceview::IV;
+

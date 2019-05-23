@@ -1,0 +1,6 @@
+ASNACN_DIR: dataview/
+PROJECT_NAME: astra-sim_rover
+deps:
+- types/base: ''
+- types/base_support: ''
+- plex/fake_rover_lib: ''
